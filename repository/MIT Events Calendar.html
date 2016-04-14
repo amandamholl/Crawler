@@ -1,0 +1,604 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <!-- start "view_helper" output --> 
+  <!-- Events Calendar uses shared code from the "mortar" repository. --> 
+  <!-- Do not modify these three links. --> 
+  <script type="text/javascript" src="/mortar/dhtml/suit_bin/suit_methods.js"></script> 
+  <script type="text/javascript" src="/mortar/dhtml/suit_bin/suit_widgets.js"></script> 
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script> 
+  <link rel="stylesheet" type="text/css" href="/mortar/dhtml/suit_bin/suit_layout.css"> 
+  <script type="text/javascript">
+  /* suit.view object
+     An object for data about the view or state of the current page.
+     This is the SUIT technique for carrying server-side values to the client side code. */
+  var qs = window.location.search;
+  if ((qs.indexOf("%3C") !== -1) && (qs.indexOf("%3C") !== -1)) {
+     var ft = qs.substring(10, qs.indexOf("&andor"));
+     ft=ft.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+     var nqs = qs.substring(0,10)+ft+qs.substr(qs.indexOf("&andor"));
+     window.location.search=nqs;
+  } 
+   
+  //$.holdReady(true);
+  suitClass.prototype.view = function() {
+    this.pageType = "index";
+    this.view = "index.html";
+    this.path = "/index.html";
+  }
+
+  function defensexss(idname) {
+    var mytext = $("#"+idname).val();
+    if (mytext.toLowerCase().indexOf('script') !== -1) {
+      mytext = mytext.replace(/(<\s*\/?\s*)script(\s*([^>]*)?\s*>)/gi ,''); //remove script tags
+      mytext = mytext.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, ''); //remove special chars
+      $("#"+idname).val(mytext);  
+    }
+  }
+
+  $(document).ready(function(){
+   
+    $("form").submit(function(){
+       defensexss('advfulltext');
+       var qs = $.QueryString("fulltext");       
+    });
+  });
+</script> 
+  <!-- local scripts should load after suit stuff, so it can use suit methods --> 
+  <script type="text/javascript" src="/dhtml/lib.js"></script> 
+  <script type="text/javascript" src="/dhtml/mm.js"></script> 
+  <link rel="stylesheet" type="text/css" href="/mit/styles/mit-daily-colors.css"> 
+  <link rel="stylesheet" type="text/css" href="/mit/styles/events-styles.css"> 
+  <link rel="stylesheet" type="text/css" href="/dhtml/suit_config/suit_template_config.css"> 
+  <link rel="stylesheet" type="text/css" href="/dhtml/suit_config/suit_template_index.css"> 
+  <!-- end "view_helper" output --> 
+  <title>
+    MIT Events Calendar
+</title> 
+  <link rel="alternate" title="MIT Events Calendar (RSS 1.0)" href="/rss" type="application/rss+xml"> 
+ </head> 
+ <body onload="eCal.loader('index.html')"> 
+  <!-- suit standard div --> 
+  <div id="hi1"> 
+   <!-- On all pages this must sync w nav3. If nav3 has shuffler.mas this must have search. If no shuffler, no search. --> 
+   <div id="skiplink">
+    Skip to: 
+    <!-- my loo --> 
+    <ul> 
+     <li><a href="#listings">listings</a></li> 
+     <li><a href="#srch">search</a></li> 
+     <!-- aka "the shuffler" --> 
+     <li><a href="#spt">spotlight</a></li> 
+     <li>or continue on to page.</li> 
+    </ul> 
+   </div> 
+   <div class="widthRestriction"> 
+    <div id="mitTopBar"> 
+     <div class="floatLeft"> 
+      <div class="height32"> 
+       <a class="MITred" href="http://web.mit.edu/index.html">massachusetts institute of technology</a> 
+      </div> 
+     </div> 
+     <div class="floatRight"> 
+      <script language="javascript" type="text/javascript">document.write("<a class='MITred' href='javascript:;' onclick=\"suit.window('http://www.srh.noaa.gov/data/forecasts/MAZ015.php?warncounty=MAC025&city=Boston', 'child', 700, 400, true);\">41.0&deg;F / 5.0&deg;C&nbsp;&nbsp;a few clouds</a>");</script> 
+      <noscript>
+       <a class="MITred" href="http://www.srh.noaa.gov/data/forecasts/MAZ015.php?warncounty=MAC025&amp;city=Boston" target="child">41.0°F / 5.0°C&nbsp;&nbsp;a few clouds</a>
+      </noscript> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="secondarycolor" class="mithome_bgmit_b"> 
+    <div class="widthRestriction"> 
+     <h1><a href="/index.html" class="mithome">calendar</a></h1> 
+     <ul class="headList"> 
+      <li class="mithome"><a class="mithome" href="/index.html">events</a></li> 
+      <li class="mithome"><a class="mithome" href="http://artscal.mit.edu/">arts</a></li> 
+      <li class="mithome"><a class="mithome" href="http://www.mitathletics.com/landing/index">athletics</a></li> 
+      <li class="mithome"><a class="mithome" href="/holidays.html">mit&nbsp;holidays</a></li> 
+      <li><a href="http://web.mit.edu/registrar/www/calendar.html" class="mithome">academic</a></li> 
+     </ul> 
+    </div> 
+   </div> 
+  </div>
+  <!-- end #hi1 -->
+  <!-- suit standard div -->
+  <div id="hi2" class="mithome_bg_b"> 
+   <div class="widthRestriction"> 
+    <div class="floatLeft"> 
+     <div class="typeDefault"> 
+      <!-- This is a hack, eventually font sizing should be localized to elements that need it. --> 
+     </div> 
+    </div> 
+    <div class="floatRight"> 
+     <div id="hi2calendar"> 
+      <!-- This is a hack, eventually font sizing should be localized to elements that need it. --> 
+      <div class="mithome_bg_b"> 
+       <div class="mithome_text_f">
+        <div class="calWrap"> 
+         <table width="100%" cellspacing="0" class="calendar"> 
+          <thead> 
+           <tr> 
+            <td><a class="mithome" href="/index.html?date=2015/4/13">&lt;&lt;</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/3/13">&lt;</a></td> 
+            <td colspan="3">April&nbsp;2016</td> 
+            <td><a href="/index.html?date=2016/5/13" class="mithome">&gt;</a></td> 
+            <td><a href="/index.html?date=2017/4/13" class="mithome">&gt;&gt;</a></td> 
+           </tr> 
+          </thead> 
+         </table> 
+         <table width="100%" cellspacing="0" class="calendar"> 
+          <thead> 
+           <tr> 
+            <th>
+             <div class="mithome_text_f">
+              Su
+             </div></th> 
+            <th>
+             <div class="mithome_text_f">
+              Mo
+             </div></th> 
+            <th>
+             <div class="mithome_text_f">
+              Tu
+             </div></th> 
+            <th>
+             <div class="mithome_text_f">
+              We
+             </div></th> 
+            <th>
+             <div class="mithome_text_f">
+              Th
+             </div></th> 
+            <th>
+             <div class="mithome_text_f">
+              Fr
+             </div></th> 
+            <th>
+             <div class="mithome_text_f">
+              Sa
+             </div></th> 
+           </tr> 
+          </thead> 
+          <tfoot> 
+           <tr> 
+            <td colspan="7">[&nbsp;<a class="mithome" href="/index.html">today</a>&nbsp;]</td> 
+           </tr> 
+          </tfoot> 
+          <tbody> 
+           <tr> 
+            <td></td> 
+            <td></td> 
+            <td></td> 
+            <td></td> 
+            <td></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/1">1</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/2">2</a></td> 
+           </tr> 
+           <tr> 
+            <td><a class="mithome" href="/index.html?date=2016/4/3">3</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/4">4</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/5">5</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/6">6</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/7">7</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/8">8</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/9">9</a></td> 
+           </tr> 
+           <tr> 
+            <td><a class="mithome" href="/index.html?date=2016/4/10">10</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/11">11</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/12">12</a></td> 
+            <!--            <td class="today">13</td>--> 
+            <td class="today"><a class="today" href="/index.html?date=2016/4/13"><span class="mithome_textfocus_f">13</span></a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/14">14</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/15">15</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/16">16</a></td> 
+           </tr> 
+           <tr> 
+            <td><a class="mithome" href="/index.html?date=2016/4/17">17</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/18">18</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/19">19</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/20">20</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/21">21</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/22">22</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/23">23</a></td> 
+           </tr> 
+           <tr> 
+            <td><a class="mithome" href="/index.html?date=2016/4/24">24</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/25">25</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/26">26</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/27">27</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/28">28</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/29">29</a></td> 
+            <td><a class="mithome" href="/index.html?date=2016/4/30">30</a></td> 
+           </tr> 
+          </tbody> 
+         </table>
+        </div>
+        <!-- calWrap --> 
+       </div>
+       <!-- mithome_text_f --> 
+      </div>
+      <!-- end mit_bg_b --> 
+     </div> 
+    </div> 
+   </div> 
+  </div>  
+  <!-- end #hi2 --> 
+  <!-- suit standard div --> 
+  <div id="mid"> 
+   <div class="widthRestriction"> 
+    <!-- suit standard div --> 
+    <div id="nav1" class="container"> 
+    </div> 
+    <!-- end #nav1 --> 
+    <!-- suit standard div --> 
+    <div id="nav2"> 
+     <div class="typeDefault">
+      <!-- This is a hack, eventually font sizing should be localized to elements that need it. --> 
+      <!-- If you change this on a page change skiplink below as well --> 
+      <div class="floatLeft"> 
+       <h2> <img src="http://events.mit.edu/graphics/add-edit.gif" style="cursor:pointer;" alt="" onclick="window.location='https://events.mit.edu/edit/edit.do'"> <a href="https://events.mit.edu/edit/edit.do">add/edit events <span class="mitOnly">(mit only)</span></a></h2> 
+      </div> 
+      <div class="floatLeft"> 
+       <h2> <img src="http://events.mit.edu/graphics/email-alert.gif" style="cursor:pointer;" alt="" onclick="window.location='https://events.mit.edu/prefs/edit.do'"> <a href="https://events.mit.edu/prefs/edit.do">email alerts <span class="mitOnly">(mit only)</span></a></h2> 
+      </div> 
+      <div class="floatLeft"> 
+       <h2> <img src="http://events.mit.edu/graphics/rss.gif" style="cursor:pointer;" alt="" onclick="window.location='http://events.mit.edu/rsssearch.html'"> <a href="http://events.mit.edu/rsssearch.html">RSS feeds</a></h2> 
+      </div> 
+      <div class="floatLeft"> 
+       <h2> <img src="http://events.mit.edu/graphics/browse.gif" style="cursor:pointer;" alt="" onclick="parent.suit.windowDialog('/browse_by_cats.html','700','500')"> <a href="javascript: parent.suit.windowDialog('/browse_by_cats.html','700','500')">browse by category</a></h2> 
+      </div> 
+      <a name="srch" id="srch"></a>
+      <!-- start shuffler DHTML  --> 
+      <div class="boxBrdrd" style="background-color:#eee"> 
+       <h2 class="MITred">quick search</h2> 
+       <div id="shuffMarg"> 
+        <form id="search" name="search" action="/searchresults.html" method="get"> 
+         <div class="container">   
+          <input id="fulltext" name="fulltext" type="text" size="18" maxlength="250">     
+          <input type="radio" name="andor" value="and" checked> all of keywords 
+          <br>     
+          <input type="radio" name="andor" value="or"> any of keywords 
+          <br>   
+         </div> 
+         <h4><span>from:</span></h4> 
+         <div class="datePull"> 
+          <!-- START OPTION_LIST COMPONENT --> 
+          <select name="start.month" id="start.month" onchange="eCal.smartDate('start.day', 'start.month', 'start.year');"> <option value="01">jan</option> <option value="02">feb</option> <option value="03">mar</option> <option value="04" selected>apr</option> <option value="05">may</option> <option value="06">jun</option> <option value="07">jul</option> <option value="08">aug</option> <option value="09">sep</option> <option value="10">oct</option> <option value="11">nov</option> <option value="12">dec</option> </select> 
+          <!-- END OPTION LIST COMPONENT --> 
+          <!-- START OPTION_LIST COMPONENT --> 
+          <select name="start.day" id="start.day" onfocus="eCal.smartDate('start.day', 'start.month', 'start.year');"> <option value="01">01</option> <option value="02">02</option> <option value="03">03</option> <option value="04">04</option> <option value="05">05</option> <option value="06">06</option> <option value="07">07</option> <option value="08">08</option> <option value="09">09</option> <option value="10">10</option> <option value="11">11</option> <option value="12">12</option> <option value="13" selected>13</option> <option value="14">14</option> <option value="15">15</option> <option value="16">16</option> <option value="17">17</option> <option value="18">18</option> <option value="19">19</option> <option value="20">20</option> <option value="21">21</option> <option value="22">22</option> <option value="23">23</option> <option value="24">24</option> <option value="25">25</option> <option value="26">26</option> <option value="27">27</option> <option value="28">28</option> <option value="29">29</option> <option value="30">30</option> <option value="31">31</option> </select> 
+          <!-- END OPTION LIST COMPONENT --> 
+          <!-- START OPTION_LIST COMPONENT --> 
+          <select name="start.year" id="start.year" onchange="eCal.smartDate('start.day', 'start.month', 'start.year');"> <option value="2014">14</option> <option value="2015">15</option> <option value="2016" selected>16</option> <option value="2017">17</option> <option value="2018">18</option> </select> 
+          <!-- END OPTION LIST COMPONENT --> 
+         </div>
+         <!-- datePull --> 
+         <h4><span>until:</span></h4> 
+         <div class="datePull"> 
+          <!-- START OPTION_LIST COMPONENT --> 
+          <select name="end.month" id="end.month" onchange="eCal.smartDate('end.day', 'end.month', 'end.year');"> <option value="01">jan</option> <option value="02">feb</option> <option value="03">mar</option> <option value="04">apr</option> <option value="05" selected>may</option> <option value="06">jun</option> <option value="07">jul</option> <option value="08">aug</option> <option value="09">sep</option> <option value="10">oct</option> <option value="11">nov</option> <option value="12">dec</option> </select> 
+          <!-- END OPTION LIST COMPONENT --> 
+          <!-- START OPTION_LIST COMPONENT --> 
+          <select name="end.day" id="end.day" onfocus="eCal.smartDate('end.day', 'end.month', 'end.year');"> <option value="01">01</option> <option value="02">02</option> <option value="03">03</option> <option value="04">04</option> <option value="05">05</option> <option value="06">06</option> <option value="07">07</option> <option value="08">08</option> <option value="09">09</option> <option value="10">10</option> <option value="11">11</option> <option value="12">12</option> <option value="13" selected>13</option> <option value="14">14</option> <option value="15">15</option> <option value="16">16</option> <option value="17">17</option> <option value="18">18</option> <option value="19">19</option> <option value="20">20</option> <option value="21">21</option> <option value="22">22</option> <option value="23">23</option> <option value="24">24</option> <option value="25">25</option> <option value="26">26</option> <option value="27">27</option> <option value="28">28</option> <option value="29">29</option> <option value="30">30</option> <option value="31">31</option> </select> 
+          <!-- END OPTION LIST COMPONENT --> 
+          <!-- START OPTION_LIST COMPONENT --> 
+          <select name="end.year" id="end.year" onchange="eCal.smartDate('end.day', 'end.month', 'end.year');"> <option value="2014">14</option> <option value="2015">15</option> <option value="2016" selected>16</option> <option value="2017">17</option> <option value="2018">18</option> </select> 
+          <!-- END OPTION LIST COMPONENT --> 
+         </div>
+         <!-- datePull --> 
+         <div align="right" id="searchButton"> 
+          <a id="search_submit" name="search_submit" href="javascript:;" onclick=" defensexss('fulltext'); suit.formSubmit('search'); return false"> <input type="submit" name="Submit" value="Search" id="SearchButton"> </a> 
+         </div> 
+        </form> 
+       </div>
+       <!-- shuffMarg --> 
+      </div>
+      <!--boxBrdrd--> 
+      <!-- end shuffler DHTML --> 
+      <div class="floatLeft"> 
+       <h2> <img src="http://events.mit.edu/graphics/magnifying-glass.gif" style="cursor:pointer;" alt="" onclick="window.location='http://events.mit.edu/search.html'"> <a href="http://events.mit.edu/search.html">advanced search</a></h2> 
+      </div> 
+      <div class="floatLeft"> 
+       <h2> <img src="http://events.mit.edu/graphics/help.gif" style="cursor:pointer;" alt="" onclick="window.location='http://events.mit.edu/help/index.html'"> <a href="http://events.mit.edu/help/index.html">help</a></h2> 
+      </div> 
+      <div class="nav2SpotBrdrd"> 
+       <table class="spotlights"> 
+        <tbody>
+         <tr> 
+          <td> &nbsp; </td> 
+         </tr> 
+         <tr> 
+          <td> &nbsp; </td> 
+         </tr> 
+        </tbody>
+       </table> 
+      </div> 
+     </div> 
+    </div> 
+    <!-- suit standard div --> 
+    <div id="nav3"></div> 
+    <!-- end #nav3 --> 
+    <!-- suit standard div --> 
+    <div id="nav4"> 
+     <!-- If you change this on a page change skiplink below as well --> 
+     <a href="http://web.mit.edu"><img id="logo_mit" src="/graphics/logo_mit.gif" alt="MIT"></a> 
+    </div> 
+    <a name="listings" id="listings"></a> 
+    <div id="content"> 
+     <h1> <a style="text-decoration:none" href="day.html?date=2016/04/12">&lt;</a>&nbsp;&nbsp;events for <span class="bigger">Wednesday, April 13, 2016</span> &nbsp;&nbsp;<a style="text-decoration:none" href="day.html?date=2016/04/14">&gt;</a> </h1> 
+     <table border="0" cellpadding="0" cellspacing="0"> 
+      <tbody>
+       <tr>
+        <td><h2><a name="events" href="#exhibits" class="MITred"></a><p><a name="events" href="#exhibits" class="MITred"><strong>Current exhibits listed at the bottom</strong></a></p></h2><h2><p></p></h2></td>
+       </tr> 
+       <!-- Holidays --> 
+       <!-- Events --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16479762">Internet of Things: Roadmap to a Connected World</a> </h2> <p> All day</p> <p>Location: ONLINE</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477163">Signed, Sealed, &amp; Undelivered: A 17th-c Postal Treasure Trove</a> </h2> <p>9:30a–12:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E52-#5&amp;mapsearch=go">E52-#5</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16481480">SPANISH Class</a> </h2> <p>9:30a–11:30a</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=13-1143&amp;mapsearch=go">13-1143</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16482819">Two-Factor Authentication Sign-Up</a> </h2> <p>10:00a–2:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W20&amp;mapsearch=go">W20</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16476343">10AM Undergraduate Admissions Information Session (followed by a campus tour)</a> </h2> <p>10:00a–11:00a</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=10-100&amp;mapsearch=go">10-100</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16475914">Newcomers Office Hour</a> </h2> <p>11:00a–12:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E23-441&amp;mapsearch=go">E23-441</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16481790">FORD-MIT Alliance - Annual Request for Proposals Info Session</a> </h2> <p>11:00a–12:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=32-G449&amp;mapsearch=go">32-G449</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15238511">Campus Tour</a> </h2> <p>11:00a–12:30p</p> <p>Location: Lobby 7 (Main Entran...</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477456">Sack Lunch Seminar (SLS) - Cara Manning, MIT-WHOI</a> </h2> <p>12:00p–1:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=54-915&amp;mapsearch=go">54-915</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485951">Computational phase field modeling: Foundations and applications in civil and environmental engineering</a> </h2> <p>12:00p–1:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=1-131&amp;mapsearch=go">1-131</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16478157">Transistor Evolution Towards 5nm Node: Band Structure Engineering and PPA Analysis</a> </h2> <p>12:00p–1:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=34-401&amp;mapsearch=go">34-401</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477205">Societal Warfare in the 21st Century</a> </h2> <p>12:00p–1:30p</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16479380">Justifying Chinese Local Government's Land Finance Regime</a> </h2> <p>12:30p–2:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=9-450&amp;mapsearch=go">9-450</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485828">American Red Cross Blood Drive (Come Donate!)</a> </h2> <p>1:00p–6:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W20 (Student Center)&amp;mapsearch=go">W20 (Student Center)</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16476374">2PM Undergraduate Admissions Information Session (followed by a campus tour)</a> </h2> <p>2:00p–3:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=10-100&amp;mapsearch=go">10-100</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485949">Thesis Defense</a> </h2> <p>2:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=Whitehead Auditorium&amp;mapsearch=go">Whitehead Auditorium</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16481940">Using Instructional Design Models for Course Design</a> </h2> <p>2:00p–3:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=32-144&amp;mapsearch=go">32-144</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485915">Every Day Words Disappear - On Radical Ecology and Tender Gardening</a> </h2> <p>2:30p–8:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E15-001&amp;mapsearch=go">E15-001</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477678">Economic Development and the Spatial Allocation of Labor: Evidence from Indonesia</a> </h2> <p>2:45p–4:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E51-395&amp;mapsearch=go">E51-395</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477689">String/Gravity Theory Seminar</a> </h2> <p>3:00p–4:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=6c-442&amp;mapsearch=go">6c-442</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15238690">Campus Tour</a> </h2> <p>3:00p–4:30p</p> <p>Location: Lobby 7 (Main Entran...</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485821">Weekly Wednesday meeting - Yoga Class</a> </h2> <p>3:00p–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E-55&amp;mapsearch=go">E-55</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477367">EAPS Department Lecture Series - Ariel Anbar, ASU</a> </h2> <p>4:00p–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=54-915&amp;mapsearch=go">54-915</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16478126">The Paradox of Policy-Relevant RCTs and Natural Experiments</a> </h2> <p>4:00p–5:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E62-250&amp;mapsearch=go">E62-250</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16478879">Robert Brucker - "The evolving hologenome: how natural selection can shape interactions of host immunity and microbiota."</a> </h2> <p>4:00p–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=48-316&amp;mapsearch=go">48-316</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16478974">Lie groups seminar</a> </h2> <p>4:00p–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=2-136&amp;mapsearch=go">2-136</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485816">From Biominerals to Ancient Technologies: Exploring New Routes for Durable Building Materials</a> </h2> <p>4:00p–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=1-131&amp;mapsearch=go">1-131</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16467506">Inorganic Harvard/MIT Seminar: Holger Braunschweig, Universitat Wuerzburg</a> </h2> <p>4:15p–5:15p</p> <p>Location: Harvard University -...</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16486221">Combinatorics Seminar</a> </h2> <p>4:15p–5:15p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=2-132&amp;mapsearch=go">2-132</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16481177">Modern Halacha</a> </h2> <p>5:00p–6:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W11&amp;mapsearch=go">W11</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> *CANCELLED*<br> <a class="MITred" href="/event.html?id=16481401">Emerson Piano recital by Andrew Wang</a> </h2> <p>5:00p–6:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=14w-111&amp;mapsearch=go">14w-111</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485642">Community Conversation: Undergraduate Withdrawal and Readmission Policies</a> </h2> <p>5:00p–6:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=3-270&amp;mapsearch=go">3-270</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15944345">Worship and Dinner</a> </h2> <p>5:15p–6:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W15&amp;mapsearch=go">W15</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16470665">MIT Aikido Club ( A Japanese Martial Art)</a> </h2> <p>5:30p–7:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W-32&amp;mapsearch=go">W-32</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16469823">A Celebration of Books of GCWS Authors</a> </h2> <p>5:30p–7:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=6-321&amp;mapsearch=go">6-321</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16482423">New Revenue through Business Model Innovation - Navigating the Cleantech Landscape</a> </h2> <p>5:30p–8:00p</p> <p>Location: Cambridge Innovation...</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16470816">Refuge at MIT: Dinner and Christian fellowship</a> </h2> <p>5:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W11-080&amp;mapsearch=go">W11-080</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15026454">MIT Aikido Club ( A Japanese Martial Art)</a> </h2> <p>6:00p–7:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W-32&amp;mapsearch=go">W-32</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16479127">TCC Wednesdays</a> </h2> <p>7:30p–9:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W15 -Chapel&amp;mapsearch=go">W15 -Chapel</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15950179">Trivia! (Thirsty Ear Pub)</a> </h2> <p>7:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=NW35-Thirsty Ear Pub&amp;mapsearch=go">NW35-Thirsty Ear Pub</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16481758">Cardio kickboxing Classes at Westgate!</a> </h2> <p>8:00p–9:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W-85&amp;mapsearch=go">W-85</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15024816">Weekly Wednesday Wings at the Muddy Charles Pub</a> </h2> <p>8:00p–9:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=50&amp;mapsearch=go">50</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16477615">Israeli Dancing</a> </h2> <p>8:00p–11:30p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=W20-491&amp;mapsearch=go">W20-491</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16481244">ACF Community Group</a> </h2> <p>9:00p–11:00p</p> <p>Location: Burton Conner</p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr>
+        <td> 
+         <hr> </td>
+       </tr> 
+       <tr>
+        <td><h2><a name="exhibits" class="MITred"><p><strong>Exhibits</strong></p></a><a></a></h2></td>
+       </tr> 
+       <!-- Exhibits --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16471355">500 P.S.I. Exhibition of Photographs by CAST Visiting Artist Keith Ellenbogen</a> </h2> <p>9:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=6C&amp;mapsearch=go">6C</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16472278">Ellen Waitzkin Photographic Exhibit: "At the Beach: Color Symmetries"</a> </h2> <p>9:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=6-3rd&amp;mapsearch=go">6-3rd</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16485792">Exhibition: The Contingent Space of Work</a> </h2> <p>9:00a–6:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=7-408&amp;mapsearch=go">7-408</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15023366">Gestural Engineering: The Sculpture of Arthur Ganson</a> </h2> <p>10:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=N-51&amp;mapsearch=go">N-51</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16479533">The Great Stride: MIT Moves to Cambridge</a> </h2> <p>10:00a–4:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=14N-130&amp;mapsearch=go">14N-130</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16480182">Holography: Dimensions of Light</a> </h2> <p>10:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=N-51&amp;mapsearch=go">N-51</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15023378">Sampling MIT</a> </h2> <p>10:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=N-51&amp;mapsearch=go">N-51</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15023354">Robots and Beyond: Exploring Artificial Intelligence at MIT</a> </h2> <p>10:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=N-51&amp;mapsearch=go">N-51</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16479976">Imagining New Technology: Building MIT in Cambridge</a> </h2> <p>10:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=N-51&amp;mapsearch=go">N-51</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=15953500">Projects and Prototypes: MIT Student Work</a> </h2> <p>10:00a–5:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=N-51&amp;mapsearch=go">N-51</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr> 
+        <td class="event_row"> <h2> <a class="MITred" href="/event.html?id=16475122">Joana Hadjithomas and Khalil Joreige: I Must First Apologize....</a> </h2> <p>12:00p–6:00p</p> <p>Building: <a href="http://whereis.mit.edu/map-jpg?mapterms=E15&amp;mapsearch=go">E15</a></p> </td> 
+       </tr>
+       <!-- event_row --> 
+       <tr>
+        <td> 
+         <hr> </td>
+       </tr> 
+       <tr>
+        <td><h2><a href="#events" class="MITred"></a><p><a href="#events" class="MITred"><strong>Back to events</strong></a><a></a></p></h2></td>
+       </tr> 
+      </tbody>
+     </table> 
+    </div>
+    <!-- END CONTENT --> 
+   </div> 
+   <!-- end #content --> 
+  </div> 
+  <!-- end widthRestriction -->  
+  <!-- end #mid --> 
+  <!-- suit standard div --> 
+  <div id="lo1"> 
+   <table width="650" border="0" cellspacing="0" cellpadding="0"> 
+    <tbody>
+     <tr align="left" valign="top"> 
+      <td colspan="7" class="footer"><a href="http://web.mit.edu" class="footer">massachusetts institute of technology</a></td> 
+      <td colspan="6" class="footer">77 massachusetts avenue<br> cambridge, ma 02139-4307</td> 
+      <td colspan="4" class="footer">tel 617.253.1000<br> tty 617.258.9344</td> 
+      <td colspan="3" class="footer"></td> 
+      <td colspan="3" class="footer"><a href="/comment-form.html" class="footer">contact</a></td> 
+     </tr> 
+    </tbody>
+   </table> 
+  </div> 
+  <!-- end #hlo1 --> 
+  <!-- suit standard div --> 
+  <div id="lo2"> 
+   <!-- This suit-standard div is empty in this implementation. Here, for now, for completeness.
+         It's set to "display:none" in the stylesheet. --> 
+  </div> 
+  <!-- end #lo2 -->   
+ </body>
+</html>

@@ -1,13 +1,8 @@
 package com.example.crawler;
 
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.File;
+import java.io.*;
 
+import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -18,12 +13,14 @@ import java.util.concurrent.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 
 /**
  * Created by amandaholl on 4/11/16.
@@ -139,7 +136,7 @@ public class Crawler {
 
             //has to be better way to do this
 
-            //Incorporate robots.txt
+            checkRobots(current_page);
 
             String domain = "";
             try {
@@ -170,6 +167,46 @@ public class Crawler {
         }
     }
 
+    /*  Check robots will open up the robots.txt file for the URL's host
+     *  and return true if robots.txt allows the page to be crawled.
+     *  Otherwise, the function returns false.
+     */
+    public static boolean checkRobots(String URL){
+        String host = "";
+        try {
+            host = new URI(URL).getHost();
+            System.out.println("Host is: "+ host);
+        }
+        catch(URISyntaxException e){
+            System.out.println("Error getting host");
+        }
+        String robots_address = "http://" + host + "/robots.txt";
+        URL robots_url;
+        try{
+            robots_url = new URL(robots_address);
+        }
+        catch(MalformedURLException e){
+            System.out.println("Could not create URL for robots.txt");
+            return false;
+        }
+        System.out.println(robots_url.toString());
+
+        try{
+            BufferedReader robots_stream = new BufferedReader(new InputStreamReader(robots_url.openStream()));
+            String line = "";
+            while((line = robots_stream.readLine()) != null){
+                //System.out.println(line);
+                // Get the folder disallowed
+                // if url is in there, don't crawl, return false
+            }
+            //close stream ?
+        }
+        catch(IOException e){
+            System.out.println("Error reading from robots.txt");
+        }
+
+        return true;
+    }
 
     public static void getPage(String URL, String domain_restriction){
         List<String> links = new LinkedList<String>();

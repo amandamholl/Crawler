@@ -29,7 +29,7 @@ public class Crawler {
     private static List<String> pages_to_crawl = new LinkedList<String>();
     private static int max_pages;
     private static String prev_page = "";
-    private static ConcurrentSkipListSet<String> hosts_visited = new ConcurrentSkipListSet<String>();
+    public static ConcurrentSkipListSet<String> hosts_visited = new ConcurrentSkipListSet<String>();
     private static Timer remove;
 
     public static void main(String[] args){
@@ -76,7 +76,7 @@ public class Crawler {
                 domain_restriction = seed[2];
             System.out.println(domain_restriction);
 
-            TimerTask removeDomains = new TimerTask(){
+            /*TimerTask removeDomains = new TimerTask(){
                 @Override
                 public void run() {
                     System.out.println("\n HERE \n");
@@ -86,7 +86,7 @@ public class Crawler {
             };
 
             remove = new Timer("MyTimer");
-            remove.scheduleAtFixedRate(removeDomains, 0, 1000);
+            remove.scheduleAtFixedRate(removeDomains, 0, 1000);*/
 
 
             /*  Start crawling with the specifications pulled from specifications.csv */
@@ -160,7 +160,6 @@ public class Crawler {
             getPage(current_page, domain_restriction);
         }
         System.out.println("\n\nDone-----------------");
-        remove.cancel();
     }
 
     /*  Check robots will open up the robots.txt file for the URL's host
@@ -262,6 +261,7 @@ public class Crawler {
         if(hosts_visited.isEmpty() || !hosts_visited.contains(domain)) { // If domain not in list of domains visited
             hosts_visited.add(domain);  // Add it
             System.out.println("\n"+ hosts_visited+ "\n");
+            new DomainTimer(domain);
         }else
             return false;   // Don't crawl this page
 

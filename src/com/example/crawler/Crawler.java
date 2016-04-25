@@ -1,4 +1,4 @@
-package src.com.example.crawler;
+package com.example.crawler;
 
 import java.io.*;
 

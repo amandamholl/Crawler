@@ -1,4 +1,4 @@
-package src.com.example.crawler;
+package com.example.crawler;
 
 import java.io.*;
 import java.util.HashSet;
@@ -19,9 +19,10 @@ import org.jsoup.select.Elements;
  */
 public class Reducer {
 	private static File textRepo = new File("textRepo");
-	private static File htmlRepo = new File("/Users/progalski/Documents/Crawler/Crawler/repository");
-	private static File stopWords = new File("/Users/progalski/Documents/Crawler/Crawler/stopwords_en.txt");
+	private static File htmlRepo = new File("repository");
+	private static File stopWords = new File("stopwords_en.txt");
 	private static HashSet<Element> excludeElements = new HashSet<>();
+	private static String comparison = "Kenya defends forcing 45 Taiwanese onto a plane to China";
 
 	public static void main(String[] args) {
 
@@ -48,7 +49,8 @@ public class Reducer {
 			System.out.println("Failed to create repository."); // Error message
 		}
 
-		readHTML();
+		//readHTML();
+		readHTML2();
 
 	}
 
@@ -56,10 +58,11 @@ public class Reducer {
 		BufferedWriter bw;
 
 		String[] entries = htmlRepo.list();
+		System.out.println(entries.length);
 		//for (String s : entries) {
 			//File current = new File(htmlRepo.getPath(), s);
 			//File current = new File(htmlRepo.getPath(), "TRS.htm");
-			File current = new File(htmlRepo.getPath(), "CNN.htm");
+			File current = new File(htmlRepo.getPath(), "CharlesKochPossibleClintoncouldbebetterthanGOPnomineeCNNPoliticscom1.html");
 
 
 			try {
@@ -97,20 +100,27 @@ public class Reducer {
 				}
 				
 				//handle ads 
-				Elements ads = doc.select("div[id~=ad], div[class~=ad]");
+				//Elements ads = doc.select("div[id~=ad], div[class~=ad], [data-analytics~=Paid], [id~=paid]");
+				Elements ads = doc.select("[id~=ad], [data-analytics~=Paid], [id~=paid], [class~=paid]");
 				for(Element ad : ads)
 				{
+					ad.attr("written", false);
 					excludeElements.add(ad);
 				}
 				
-				
+				System.out.println(excludeElements);
 				boolean canWrite = true;
 				
 				//Hanlde divs with text 
-				Elements divs = doc.getElementsByTag("div");
+				//Elements divs = doc.getElementsByTag("div");
+				Elements divs = doc.select("span, h3, h2");
 				for(Element div : divs) {
+					//if(excludeElements.contains(div))
+						//System.out.println(excludeElements.contains(div));
 					if(!excludeElements.contains(div))
 					{
+						bw.write(div.text());
+
 						Elements parents = div.parents();
 						for (Element parent : parents) {
 							if (excludeElements.contains(parent) || parent.hasAttr("written")) {
@@ -122,13 +132,17 @@ public class Reducer {
 						}
 					}
 					if (canWrite) {
+						System.out.println("HERE");
 						div.attr("written", true);
 						String divText = removeStopWords(div.text());
-						bw.write(divText);
+						//bw.write(divText);
+						bw.write(div.text());
 						bw.newLine();
 					}
+
 				}
-						
+
+
 				Elements pgraphs = doc.getElementsByTag("p");
 				for (Element pgraph : pgraphs) {
 					if(!excludeElements.contains(pgraph)) {
@@ -197,6 +211,69 @@ public class Reducer {
 		//}
 
 
+	}
+
+	public static void readHTML2() {
+		BufferedWriter bw;
+
+		String[] entries = htmlRepo.list();
+		System.out.println(entries.length);
+		//for (String s : entries) {
+		//File current = new File(htmlRepo.getPath(), s);
+		//File current = new File(htmlRepo.getPath(), "TRS.htm");
+		File current = new File(htmlRepo.getPath(), "CharlesKochPossibleClintoncouldbebetterthanGOPnomineeCNNPoliticscom1.html");
+
+
+		try {
+
+			Document doc = Jsoup.parse(current, null);
+
+			// write stuff to text file
+			String filename = "textRepo/" + doc.title() + ".text";
+			File outputFile = new File(filename);
+
+			if (!outputFile.exists()) {
+				outputFile.createNewFile();
+			}
+
+			bw = new BufferedWriter(new FileWriter(outputFile));
+
+			Elements tree = TopicTree(doc.select("body"));
+			bw.write(tree.text());
+
+
+			bw.close();
+
+		} catch (FileNotFoundException e) {
+			System.out.println("HTML file not found.");
+			return;
+		} catch (IOException e) {
+			System.out.println("Error reading HTML file.");
+			return;
+		}
+		//}
+
+
+	}
+
+	private static Elements TopicTree(Elements elt){
+		if(elt != null && (elt.size() > 0)){
+			for(Element child : elt){
+				double comp = ((len(child)/comparison.length())*(1/.3)-1);
+				if((int) Math.signum(comp) < 1){
+					child.remove();
+				}
+			}
+			for(Element next : elt){
+				TopicTree(next.children());
+			}
+		}
+		return elt;
+	}
+
+	private static int len(Element elt){
+		String txt = elt.text();
+		return txt.length();
 	}
 
 	private static String removeStopWords(String text) {

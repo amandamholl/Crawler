@@ -56,17 +56,17 @@ public class Reducer {
 		BufferedWriter bw;
 
 		String[] entries = htmlRepo.list();
-		//for (String s : entries) {
-			//File current = new File(htmlRepo.getPath(), s);
+		for (String s : entries) {
+			File current = new File(htmlRepo.getPath(), s);
 			//File current = new File(htmlRepo.getPath(), "TRS.htm");
-			File current = new File(htmlRepo.getPath(), "CNN.htm");
+			//File current = new File(htmlRepo.getPath(), "CNN.htm");
 
 
 			try {
 
 				Document doc = Jsoup.parse(current, null);
 
-				// write stuff to text file
+				//create output text file
 				String filename = "textRepo/" + doc.title() + ".text";
 				File outputFile = new File(filename);
 
@@ -107,27 +107,27 @@ public class Reducer {
 				boolean canWrite = true;
 				
 				//Hanlde divs with text 
-				Elements divs = doc.getElementsByTag("div");
-				for(Element div : divs) {
-					if(!excludeElements.contains(div))
-					{
-						Elements parents = div.parents();
-						for (Element parent : parents) {
-							if (excludeElements.contains(parent) || parent.hasAttr("written")) {
-								// if the <div> element's parent is header or footer do not write it to file
-								canWrite = false;
-								div.attr("written", false);
-								break;
-							}
-						}
-					}
-					if (canWrite) {
-						div.attr("written", true);
-						String divText = removeStopWords(div.text());
-						bw.write(divText);
-						bw.newLine();
-					}
-				}
+//				Elements divs = doc.getElementsByTag("div");
+//				for(Element div : divs) {
+//					if(!excludeElements.contains(div))
+//					{
+//						Elements parents = div.parents();
+//						for (Element parent : parents) {
+//							if (excludeElements.contains(parent) || parent.hasAttr("written")) {
+//								// if the <div> element's parent is header or footer do not write it to file
+//								canWrite = false;
+//								div.attr("written", false);
+//								break;
+//							}
+//						}
+//					}
+//					if (canWrite) {
+//						div.attr("written", true);
+//						String divText = removeStopWords(div.text());
+//						bw.write(divText);
+//						bw.newLine();
+//					}
+//				}
 						
 				Elements pgraphs = doc.getElementsByTag("p");
 				for (Element pgraph : pgraphs) {
@@ -194,7 +194,7 @@ public class Reducer {
 				System.out.println("Error reading HTML file.");
 				return;
 			}
-		//}
+		}
 
 
 	}
@@ -203,9 +203,10 @@ public class Reducer {
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(stopWords));
+			text = text.replace("&nbsp;","");
 			String line;
 			while ((line = br.readLine()) != null) {
-				text.replaceAll(line, "");
+				text = text.replaceAll("\\b"+line+"\\b", "");
 			}
 			br.close();
 			return text;

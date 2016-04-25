@@ -133,8 +133,9 @@ public class Crawler {
             //System.out.println(pages_crawled.size());
 
             /*  If the domain has been visited in the last second, don't crawl this page */
+
             if(!checkDomain(current_page)) {
-                System.out.println("be polite");
+                //System.out.println("be polite");
                 pages_to_crawl.add(current_page);   // Add the page back in the list of pages to crawl b/c politeness protocol says we can't right now
                 pages_crawled.remove(current_page);
                 continue;
@@ -151,6 +152,8 @@ public class Crawler {
             /*  There was a problem with crawling the page. Ignore and keep crawling */
             if(!getPage(current_page, domain_restriction))
                 continue;
+            else
+                System.out.println(pages_to_crawl);
         }
         System.out.println("\n\nDone-----------------");
 
@@ -255,6 +258,7 @@ public class Crawler {
             return false;
         }
 
+
         /*  Check if crawling a page from a domain visited within the last second.
          *  If so, do not crawl. Otherwise, go ahead and crawl.
          */
@@ -285,7 +289,11 @@ public class Crawler {
             }
 
             Elements img = doc.getElementsByTag("img");
-            Elements outlinks = doc.select("a[href~=\\bhttps?://(?!\\S+(?:jpe?g|png|bmp|gif))\\S+]");   // Make sure no images fetched
+            Elements outlinks = doc.select("a[href]");
+
+
+            // re no images fetched
+
 
             /* Write requirements to report.html */
             FileWriter page = null;
@@ -330,19 +338,23 @@ public class Crawler {
             report_content += "<p><strong>Number of outlinks:</strong> "+outlinks.size()+"</p>";
 
 
-            for(Element link: outlinks){
-                /*  If there is no domain restriction, add the link to the list of pages to crawl */
-                if(domain_restriction == ""){
-                    //System.out.println("no restrict");
-                    links.add(link.absUrl("href"));
-                }
-                /*  If there is domain restriction (from specifications.csv, add the link to the list
-                 *  pages to crawl only if it conforms to the domain restriction to the set of pages
-                 *  to crawl.
-                 */
-                else{
-                    if(link.attr("href").contains(domain_restriction))  //Check conformity to domain restriction
-                        links.add(link.absUrl("href"));
+            for(Element link: outlinks) {
+                String absURL = link.absUrl("href");
+
+                if (!(absURL.contains(".pdf") || absURL.contains(".PDF") || absURL.contains(".jpg") || absURL.contains(".jpeg") || absURL.contains(".gif") || absURL.contains(".bmp") || absURL.contains("#"))){
+                    /*  If there is no domain restriction, add the link to the list of pages to crawl */
+                    if (domain_restriction == "") {
+                        //System.out.println("no restrict");
+                        links.add(absURL);
+                    }
+                    /*  If there is domain restriction (from specifications.csv, add the link to the list
+                     *  pages to crawl only if it conforms to the domain restriction to the set of pages
+                     *  to crawl.
+                     */
+                    else {
+                        if (absURL.contains(domain_restriction))  //Check conformity to domain restriction
+                            links.add(absURL);
+                    }
                 }
             }
 

@@ -20,7 +20,7 @@ public class DomainTimer {
 
     class RemoveHost extends TimerTask {
         public void run() {
-            //System.out.println(host+"%n");
+            System.out.println("here");
             if(!hosts_visited.isEmpty())
                 hosts_visited.remove(host);
 

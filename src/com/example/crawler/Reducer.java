@@ -7,7 +7,8 @@ import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
+
+
 import org.jsoup.select.Elements;
 
 /*
@@ -195,6 +196,7 @@ public class Reducer {
 			}
 		//}
 
+
 	}
 
 	private static String removeStopWords(String text) {
@@ -212,5 +214,6 @@ public class Reducer {
 			return text;
 		}
 	}
+
 
 }

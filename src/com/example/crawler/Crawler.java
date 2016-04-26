@@ -121,27 +121,42 @@ public class Crawler {
     public static void crawl(String URL, String domain_restriction){
         while(pages_crawled.size() < max_pages){
             String current_page;
+            String santized_string;     // This is the string that is actually added to the pages_crawled list
 
             if(!pages_to_crawl.isEmpty()){  // If there are pages to crawl
                 do{
                     current_page = pages_to_crawl.remove(0);
-                }while(pages_crawled.contains(current_page));
+                    // Remove the http protocol and trailing slash if present to prevent duplicates
+                    santized_string = current_page.replaceFirst("^(https?://)","");
+                    if (santized_string.endsWith("/")) {
+                        santized_string = santized_string.substring(0, santized_string.length() - 1);
+                    }
+                }while(pages_crawled.contains(santized_string));
             }
-            else
+            else {
                 current_page = URL;
+                // Remove the http protocol and trailing slash if present to prevent duplicates
+                santized_string = current_page.replaceFirst("^(https?://)","");
+                if (santized_string.endsWith("/")) {
+                    santized_string = santized_string.substring(0, santized_string.length() - 1);
+                }
+            }
 
-            //System.out.println(pages_crawled.size());
+            //System.out.println(santized_string+"\n");
 
             /*  If the domain has been visited in the last second, don't crawl this page */
 
             if(!checkDomain(current_page)) {
                 //System.out.println("be polite");
                 pages_to_crawl.add(current_page);   // Add the page back in the list of pages to crawl b/c politeness protocol says we can't right now
-                pages_crawled.remove(current_page);
+                pages_crawled.remove(santized_string);
                 continue;
             }
 
-            pages_crawled.add(current_page);
+            //System.out.println(santized_string);
+            //System.out.println(pages_crawled);
+
+            pages_crawled.add(santized_string);
 
             /*  Crawling this page is disallowed by site's robots.txt
              *  Return and do not crawl.
@@ -152,8 +167,8 @@ public class Crawler {
             /*  There was a problem with crawling the page. Ignore and keep crawling */
             if(!getPage(current_page, domain_restriction))
                 continue;
-            else
-                System.out.println(pages_to_crawl);
+            //else
+                //System.out.println(pages_to_crawl);
         }
         System.out.println("\n\nDone-----------------");
 
@@ -265,7 +280,7 @@ public class Crawler {
 
         if(domain != null && !hosts_visited.contains(domain)) { // If domain not in list of domains visited
             hosts_visited.add(domain);  // Add it
-            System.out.println("\n"+ hosts_visited+ "\n");
+            //System.out.println("\n"+ hosts_visited+ "\n");
             new DomainTimer(domain);
             return true;
         }else
@@ -276,6 +291,8 @@ public class Crawler {
     public static boolean getPage(String URL, String domain_restriction){
         List<String> links = new LinkedList<String>();
         String report_content = "";
+
+        System.out.println(URL);
 
         try {
             /* Connect to page */
@@ -341,10 +358,9 @@ public class Crawler {
             for(Element link: outlinks) {
                 String absURL = link.absUrl("href");
 
-                if (!(absURL.contains(".pdf") || absURL.contains(".PDF") || absURL.contains(".jpg") || absURL.contains(".jpeg") || absURL.contains(".gif") || absURL.contains(".bmp") || absURL.contains("#"))){
+                if (!(absURL.contains(".pdf") || absURL.contains(".PDF") || absURL.contains(".jpg") || absURL.contains(".png") ||absURL.contains(".jpeg") || absURL.contains(".gif") || absURL.contains(".bmp") || absURL.contains("#"))){
                     /*  If there is no domain restriction, add the link to the list of pages to crawl */
                     if (domain_restriction == "") {
-                        //System.out.println("no restrict");
                         links.add(absURL);
                     }
                     /*  If there is domain restriction (from specifications.csv, add the link to the list
@@ -382,7 +398,7 @@ public class Crawler {
     }
 
     public static void writeToReport(String report_content){
-        System.out.println("content" + report_content);
+        //System.out.println("content" + report_content);
         try {
             writer_report.write(report_content);
             writer_report.newLine();

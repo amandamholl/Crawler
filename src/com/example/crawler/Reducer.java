@@ -7,6 +7,7 @@ import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 
 
 import org.jsoup.select.Elements;
@@ -18,10 +19,11 @@ import org.jsoup.select.Elements;
  */
 public class Reducer {
 	private static File textRepo = new File("textRepo");
-	private static File htmlRepo = new File("/Users/progalski/Documents/Crawler/Crawler/repository");
-	private static File stopWords = new File("/Users/progalski/Documents/Crawler/Crawler/stopwords_en.txt");
+	private static File htmlRepo = new File("repository");
+	private static File stopWords = new File("stopwords_en.txt");
 	private static List<Element> excludeElements = new ArrayList<>();
-	private static String comparison = "Kenya defends forcing 45 Taiwanese onto a plane to China";
+	private static String comparison = "This is a comparison string for comparing to remove noise hopefully";
+	private static BufferedWriter bw;
 
 	public static void main(String[] args) {
 
@@ -48,7 +50,8 @@ public class Reducer {
 			System.out.println("Failed to create repository."); // Error message
 		}
 
-		readHTML2();
+
+		readHTML();
 
 	}
 
@@ -81,40 +84,30 @@ public class Reducer {
 		}
 	}
 
-	public static void handleImages(Document doc, BufferedWriter bw)
+	public static void handleImages(Element elt)
 	{
-		//Handle img alt tags 
-		boolean canWrite = true;
-		Elements imgElements = doc.getElementsByTag("img");
-		for(Element img : imgElements) {
-			Elements imgParents = imgElements.parents();
-			for(Element parent : imgParents) {
-				if(excludeElements.contains(parent)) {
-					canWrite = false;
-					break;
-				}
+		//Handle img alt tags
+
+		try {
+			if(elt.attr("alt") != ""){
+				bw.write(sanitizeTree(elt.attr("alt")));
+				bw.newLine();
 			}
-			if(canWrite) {
-				try {
-					bw.write(img.attr("alt"));
-					bw.newLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-					return;
-				}
-				
-			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+
 	}
+
 	public static void excludeElements(Document doc)
 	{
-		Elements headers = doc.select("div[id~=header], div[class~=header]");
+		Elements headers = doc.select("div[id~=header], div[class~=header], header");
 		 for(Element head : headers) {
 			 excludeElements.add(head);
 		 }
 		 
-		 Elements footers = doc.select("div[id~=foot], div[class~=foot]");
+		 Elements footers = doc.select("div[id~=foot], div[class~=foot], footer");
 		 for(Element foot : footers) {
 			 excludeElements.add(foot);
 		 }
@@ -126,7 +119,7 @@ public class Reducer {
 		}
 		
 		//handle ads 
-		Elements ads = doc.select("div[id~=ad], div[class~=^ad$], div[data-analytics~=Paid], div[id~=paid], div[class~=paid]");
+		Elements ads = doc.select("[id~=^ad],[id~=ad$],[class~=^ad],[class~=ad$], [data-analytics~=^Paid], [id~=^paid], [class~=^paid]");
 		for(Element ad : ads)
 		{
 			excludeElements.add(ad);
@@ -138,10 +131,17 @@ public class Reducer {
 		{
 			excludeElements.add(banner);
 		}
-		
+
+		//handle noscript -> will be redundant info
+		Elements noscripts = doc.select("noscript");
+		for(Element noscript : noscripts)
+		{
+			excludeElements.add(noscript);
+		}
+
 	}
-	public static void readHTML2() {
-		BufferedWriter bw;
+	public static void readHTML() {
+
 
 		String[] entries = htmlRepo.list();
 		for (String s : entries) {
@@ -152,7 +152,7 @@ public class Reducer {
 			Document doc = Jsoup.parse(current, null);
 
 			// write stuff to text file
-			String filename = "textRepo/" + doc.title() + ".text";
+			String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt"; // Follow same naming convention as html page
 			File outputFile = new File(filename);
 
 			if (!outputFile.exists()) {
@@ -164,11 +164,12 @@ public class Reducer {
 			excludeElements(doc);
 
 			Elements tree = TopicTree(doc.select("body"));
-			
-			String treeText = removeStopWords(tree.text());
+
+			String treeText = sanitizeTree(tree.text());
+
 			bw.write(treeText);
 
-			handleImages(doc, bw);
+			//handleImages(doc.select("body"));
 			//handleLists(doc, bw);
 
 			bw.close();
@@ -186,24 +187,30 @@ public class Reducer {
 	}
 
 	private static Elements TopicTree(Elements elt){
+		boolean canWrite = true;
 		if(elt != null && (elt.size() > 0)){
 			for(Element child : elt){
 				if(!excludeElements.contains(child)) {
 					double comp = ((len(child)/comparison.length())*(1/.3)-1);
-					if((int) Math.signum(comp) < 1){
+
+					if((int) Math.signum(comp) < 1 && !tagImportant(child.tag())){
 						child.remove();
 					}
-					else {
+					else if(child.tagName().equals("img")){
 						Elements parents = child.parents();
 						for(Element parent : parents) {
 							if(excludeElements.contains(parent)) {
-								child.remove();
+								canWrite = false;
 								break;
 							}
 						}
+
+						if(canWrite)
+							handleImages(child);
 					}
 				} else if(excludeElements.contains(child)) {
 					//don't want to write this to file so delete
+
 					child.remove();
 				}
 			}
@@ -214,16 +221,27 @@ public class Reducer {
 		return elt;
 	}
 
+	private static boolean tagImportant(Tag t){
+		String tag = t.getName();
+		// Check for special tags, whose text content is likely less than comparison, but still have value content
+		// Only h1-h3 chosen because these are the most important
+		if(tag.equals("a") || tag.equals("h1") || tag.equals("h2") || tag.equals("h3") || tag.equals("img") || tag.equals("figcaption")) {
+			return true;    //tag is important
+		}
+		return false;	//tag not important
+	}
+
 	private static int len(Element elt){
 		String txt = elt.text();
 		return txt.length();
 	}
 
-	private static String removeStopWords(String text) {
-		BufferedReader br;
+	private static String sanitizeTree(String text) {
+		/*BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(stopWords));
 			text = text.replace("&nbsp;","");
+			text = text.toLowerCase();	// convert all to lower case so case doesn't mess up match with stopwords (since all of those are lowercase)
 			String line;
 			while ((line = br.readLine()) != null) {
 				text = text.replaceAll("\\b"+line+"\\b", "");
@@ -233,7 +251,10 @@ public class Reducer {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return text;
-		}
+		}*/
+		text = text.replace("&nbsp;","");
+		text = text.toLowerCase();
+		return text;
 	}
 
 

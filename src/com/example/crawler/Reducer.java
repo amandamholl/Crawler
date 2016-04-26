@@ -48,7 +48,6 @@ public class Reducer {
 			System.out.println("Failed to create repository."); // Error message
 		}
 
-		//readHTML();
 		readHTML2();
 
 	}

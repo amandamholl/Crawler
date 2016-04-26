@@ -1,3 +1,10 @@
+/*
+ * Cralwer.java
+ * 
+ * Authors: Paige Rogalski and Amanda Holl
+ * 
+ * Copyright 2016 
+ */
 package com.example.crawler;
 
 import java.io.*;
@@ -18,9 +25,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-/**
- * Created by amandaholl on 4/11/16.
- */
 public class Crawler {
     private static File repository = new File("repository");
     private static FileWriter report = null;
@@ -34,7 +38,6 @@ public class Crawler {
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
 
     public static void main(String[] args) throws IOException {
-
         /*  If the "repository" directory already exists delete it
          *  by removing all of its files and then the directory itself.
          *  Ensures only pages from this run are added to the folder.
@@ -42,7 +45,6 @@ public class Crawler {
         if(repository.exists()){
             String[] entries = repository.list();
             for(String s: entries){     // Delete all pages in repository
-                //System.out.println("here");
                 File current = new File(repository.getPath(),s);
                 current.delete();
             }
@@ -87,7 +89,6 @@ public class Crawler {
         else{
             System.out.println("Error getting seed.");
         }
-
     }
 
     public static String[] readCSV(){
@@ -213,7 +214,6 @@ public class Crawler {
         }
         //System.out.println(robots_url.toString());
 
-
         try{
             BufferedReader robots_stream = new BufferedReader(new InputStreamReader(robots_url.openStream()));
             String line = "";
@@ -248,11 +248,10 @@ public class Crawler {
                             return false;
                         }
                     }
-
-
                 }
             }
-            //close stream ?
+            //close stream 
+            robots_stream.close();
         }
         catch(IOException e){
             System.out.println("Error reading from robots.txt");
@@ -272,7 +271,6 @@ public class Crawler {
             System.out.println("Error getting host");
             return false;
         }
-
 
         /*  Check if crawling a page from a domain visited within the last second.
          *  If so, do not crawl. Otherwise, go ahead and crawl.
@@ -308,21 +306,17 @@ public class Crawler {
             Elements img = doc.getElementsByTag("img");
             Elements outlinks = doc.select("a[href]");
 
-
             // re no images fetched
-
 
             /* Write requirements to report.html */
             FileWriter page = null;
 
             BufferedWriter writer_page = null;
 
-
             /*  Generate the filename for the local copy of file. This will be the title of the page followed by a unqiue
              *  number to prevent conflicts between pages that have the same title since titles aren't unique.
              */
             String filename = "repository/"+doc.title().replaceAll("[^A-Za-z0-9()\\[\\]]", "")+pages_crawled.size()+".html";
-
 
             /* Download file */
             try{
@@ -353,7 +347,6 @@ public class Crawler {
             report_content += "<p><strong>Number of images:</strong> "+img.size()+"</p>";
             /*  Req. 5: Write the number of outlinks contained on the page */
             report_content += "<p><strong>Number of outlinks:</strong> "+outlinks.size()+"</p>";
-
 
             for(Element link: outlinks) {
                 String absURL = link.absUrl("href");

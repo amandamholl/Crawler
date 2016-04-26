@@ -1,3 +1,10 @@
+/*
+ * Reducer.java
+ * 
+ * Authors: Paige Rogalski and Amanda Holl
+ * 
+ * Copyright 2016 
+ */
 package src.com.example.crawler;
 
 import java.io.*;
@@ -13,9 +20,8 @@ import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 /*
- * Keep meta content?
- * 
- * 
+ * Class that reduces the HTML files obtained from the Crawler and
+ * outputs the text to a text file for further analysis  
  */
 public class Reducer {
 	private static File textRepo = new File("textRepo");
@@ -50,20 +56,20 @@ public class Reducer {
 			System.out.println("Failed to create repository."); // Error message
 		}
 
-
 		readHTML();
-
 	}
 
-
-	public static void handleLists(Document doc, BufferedWriter bw)
-	{
-		//Handle list items - we want to include these because list are usually important
-		// example is in Wikipedia references, those are usually relevant to the page
+	/*
+	 * This function handles list items
+	 * we want to include these because list are usually important
+	 * example is in Wikipedia references, those are usually relevant to the page
+	 */
+	public static void handleLists(Document doc, BufferedWriter bw) {
+		
+		//Handle list items
 		boolean canWrite = true;
 		Elements listElements = doc.getElementsByTag("li");
 		for(Element listItem : listElements) {
-			//need to check if parent has already been written 
 			Elements listParents = listItem.parents();
 			for(Element parent : listParents) {
 				if(excludeElements.contains(parent)) {
@@ -84,10 +90,11 @@ public class Reducer {
 		}
 	}
 
-	public static void handleImages(Element elt)
-	{
+	/*
+	 * This function hanldes HTML img alt tags 
+	 */
+	public static void handleImages(Element elt) {
 		//Handle img alt tags
-
 		try {
 			if(elt.attr("alt") != ""){
 				bw.write(sanitizeTree(elt.attr("alt")));
@@ -96,50 +103,46 @@ public class Reducer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-
 	}
 
-	public static void excludeElements(Document doc)
-	{
+	/*
+	 * This fucntion identifies HTML tags that we do not want to include in our text document
+	 * and adds them to a list 
+	 */
+	public static void excludeElements(Document doc) {
 		Elements headers = doc.select("div[id~=header], div[class~=header], header");
-		 for(Element head : headers) {
+		 for(Element head : headers) 
 			 excludeElements.add(head);
-		 }
 		 
 		 Elements footers = doc.select("div[id~=foot], div[class~=foot], footer");
-		 for(Element foot : footers) {
+		 for(Element foot : footers) 
 			 excludeElements.add(foot);
-		 }
+		 
+		 //gets any div with id containing nav
+		 Elements navs = doc.select("div[id~=nav], div[class~=nav], nav");	
+		 for(Element nav : navs)
+			 excludeElements.add(nav);
 		
-		Elements navs = doc.select("div[id~=nav], div[class~=nav], nav");	//gets any div with id containing nav
-		for(Element nav : navs)
-		{
-			excludeElements.add(nav);
-		}
+		 //handle ads 
+		 Elements ads = doc.select("[id~=^ad],[id~=ad$],[class~=^ad],[class~=ad$], [data-analytics~=^Paid], [id~=^paid], [class~=^paid]");
+		 for(Element ad : ads)
+			 excludeElements.add(ad);
 		
-		//handle ads 
-		Elements ads = doc.select("[id~=^ad],[id~=ad$],[class~=^ad],[class~=ad$], [data-analytics~=^Paid], [id~=^paid], [class~=^paid]");
-		for(Element ad : ads)
-		{
-			excludeElements.add(ad);
-		}
-		
-		//handle banners
-		Elements banners = doc.select("div.banner, div[id~=banner]");
-		for(Element banner : banners) 
-		{
+		 //handle banners
+		 Elements banners = doc.select("div.banner, div[id~=banner]");
+		 for(Element banner : banners) 
 			excludeElements.add(banner);
-		}
 
 		//handle noscript -> will be redundant info
 		Elements noscripts = doc.select("noscript");
 		for(Element noscript : noscripts)
-		{
 			excludeElements.add(noscript);
-		}
-
 	}
+	
+	/*
+	 * This function reads in the HTML file from the repository 
+	 * and begins to parse it to reduce noise
+	 */
 	public static void readHTML() {
 
 
@@ -152,12 +155,12 @@ public class Reducer {
 			Document doc = Jsoup.parse(current, null);
 
 			// write stuff to text file
-			String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt"; // Follow same naming convention as html page
+			// Follow same naming convention as html page
+			String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt"; 
 			File outputFile = new File(filename);
 
-			if (!outputFile.exists()) {
+			if (!outputFile.exists()) 
 				outputFile.createNewFile();
-			}
 
 			bw = new BufferedWriter(new FileWriter(outputFile));
 			
@@ -186,17 +189,22 @@ public class Reducer {
 
 	}
 
+	/*
+	 * This function calculates the length of the HTML DOM element,
+	 * compares it to a base string and uses statistics to reduce noise
+	 */
 	private static Elements TopicTree(Elements elt){
 		boolean canWrite = true;
 		if(elt != null && (elt.size() > 0)){
 			for(Element child : elt){
 				if(!excludeElements.contains(child)) {
+					//compare the element's length to the "base" string 
 					double comp = ((len(child)/comparison.length())*(1/.3)-1);
 
 					if((int) Math.signum(comp) < 1 && !tagImportant(child.tag())){
 						child.remove();
-					}
-					else if(child.tagName().equals("img")){
+					} else if(child.tagName().equals("img")){
+						//check image tags and their parents to see if we should include
 						Elements parents = child.parents();
 						for(Element parent : parents) {
 							if(excludeElements.contains(parent)) {
@@ -204,13 +212,11 @@ public class Reducer {
 								break;
 							}
 						}
-
 						if(canWrite)
 							handleImages(child);
 					}
 				} else if(excludeElements.contains(child)) {
 					//don't want to write this to file so delete
-
 					child.remove();
 				}
 			}
@@ -221,6 +227,9 @@ public class Reducer {
 		return elt;
 	}
 
+	/*
+	 * This function identifies other important HTML tags we want to include in the text
+	 */
 	private static boolean tagImportant(Tag t){
 		String tag = t.getName();
 		// Check for special tags, whose text content is likely less than comparison, but still have value content
@@ -236,6 +245,9 @@ public class Reducer {
 		return txt.length();
 	}
 
+	/*
+	 * This function removes stop words and non-breaking spaces from the text 
+	 */
 	private static String sanitizeTree(String text) {
 		/*BufferedReader br;
 		try {
@@ -256,6 +268,5 @@ public class Reducer {
 		text = text.toLowerCase();
 		return text;
 	}
-
 
 }

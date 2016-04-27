@@ -1,3 +1,11 @@
+/*
+ * DomainTimer.java
+ *
+ * Authors: Amanda Holl and Paige Rogalski
+ *
+ * Copyright 2016
+ */
+
 package com.example.crawler;
 
 import java.util.Timer;
@@ -5,9 +13,6 @@ import java.util.TimerTask;
 
 import static com.example.crawler.Crawler.hosts_visited;
 
-/**
- * Created by amandaholl on 4/20/16.
- */
 public class DomainTimer {
     Timer timer;
     final String host;

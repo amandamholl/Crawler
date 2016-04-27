@@ -1,4 +1,4 @@
-# From: http://stackoverflow.com/questions/16997165/unique-word-frequency-in-multiple-files
+# Adapted from: http://stackoverflow.com/questions/16997165/unique-word-frequency-in-multiple-files
 
 from collections import Counter
 from glob import iglob

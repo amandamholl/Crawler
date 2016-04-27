@@ -13,7 +13,6 @@ import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 /*
- * Keep meta content?
  * 
  * 
  */
@@ -54,38 +53,9 @@ public class Reducer {
 
 	}
 
-
-	public static void handleLists(Document doc, BufferedWriter bw)
-	{
-		//Handle list items - we want to include these because list are usually important
-		// example is in Wikipedia references, those are usually relevant to the page
-		boolean canWrite = true;
-		Elements listElements = doc.getElementsByTag("li");
-		for(Element listItem : listElements) {
-			//need to check if parent has already been written 
-			Elements listParents = listItem.parents();
-			for(Element parent : listParents) {
-				if(excludeElements.contains(parent)) {
-					canWrite = false;
-					break;
-				}
-			}
-			if(canWrite) {
-				try {
-					bw.write(listItem.text());
-					bw.newLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-					return;
-				}
-			}
-		}
-	}
-
 	public static void handleImages(Element elt)
 	{
-		//Handle img alt tags
+		/* Write alt image text if present */
 
 		try {
 			if(elt.attr("alt") != ""){
@@ -95,8 +65,6 @@ public class Reducer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-
 	}
 
 	public static void excludeElements(Document doc)
@@ -118,7 +86,7 @@ public class Reducer {
 		}
 		
 		//handle ads 
-		Elements ads = doc.select("[id~=^ad],[id~=ad$],[class~=^ad],[class~=ad$], [data-analytics~=^Paid], [id~=^paid], [class~=^paid]");
+		Elements ads = doc.select("[id~=^ad],[id~=ad$],[class~=^ad],[class~=ad$], [data-analytics~=^Paid], [id~=^paid], [class~=^paid], [id~=logo], [class~=logo]");
 		for(Element ad : ads)
 		{
 			excludeElements.add(ad);
@@ -139,52 +107,48 @@ public class Reducer {
 		}
 
 	}
+
 	public static void readHTML() {
-
-
 		String[] entries = htmlRepo.list();
 		for (String s : entries) {
-		File current = new File(htmlRepo.getPath(), s);
+			File current = new File(htmlRepo.getPath(), s);
 
-		try {
+			try {
 
-			Document doc = Jsoup.parse(current, null);
+				Document doc = Jsoup.parse(current, null);
 
-			// write stuff to text file
-			String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt"; // Follow same naming convention as html page
-			File outputFile = new File(filename);
+				// write stuff to text file
+				String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt"; // Follow same naming convention as html page
+				File outputFile = new File(filename);
 
-			if (!outputFile.exists()) {
-				outputFile.createNewFile();
+				if (!outputFile.exists()) {
+					outputFile.createNewFile();
+				}
+
+				bw = new BufferedWriter(new FileWriter(outputFile));
+
+				excludeElements(doc);
+
+				Elements tree = TopicTree(doc.select("body"));
+
+				String treeText = sanitizeTree(tree.text());
+
+				bw.write(treeText);		// Write sanitized, reduced content to file
+				bw.close();
+
+			} catch (FileNotFoundException e) {
+				System.out.println("HTML file not found.");
+				return;
+			} catch (IOException e) {
+				System.out.println("Error reading HTML file.");
+				return;
 			}
-
-			bw = new BufferedWriter(new FileWriter(outputFile));
-			
-			excludeElements(doc);
-
-			Elements tree = TopicTree(doc.select("body"));
-
-			String treeText = sanitizeTree(tree.text());
-
-			bw.write(treeText);
-
-			//handleImages(doc.select("body"));
-			//handleLists(doc, bw);
-
-			bw.close();
-
-		} catch (FileNotFoundException e) {
-			System.out.println("HTML file not found.");
-			return;
-		} catch (IOException e) {
-			System.out.println("Error reading HTML file.");
-			return;
-		}
 		}
 
 
 	}
 
+	/* 	Recursively build the "Topic Tree," aka the DOM tree that represents the main content */
 	private static Elements TopicTree(Elements elt){
 		boolean canWrite = true;
 		if(elt != null && (elt.size() > 0)){
@@ -192,9 +156,13 @@ public class Reducer {
 				if(!excludeElements.contains(child)) {
 					double comp = ((len(child)/comparison.length())*(1/.3)-1);
 
+					/* 	Compute the weight of the element and remove if below threshold,
+					 * 	unless it is an important tag with potentially little content.
+					 */
 					if((int) Math.signum(comp) < 1 && !tagImportant(child.tag())){
 						child.remove();
 					}
+					/*	Case for images */
 					else if(child.tagName().equals("img")){
 						Elements parents = child.parents();
 						for(Element parent : parents) {
@@ -203,16 +171,18 @@ public class Reducer {
 								break;
 							}
 						}
-
-						if(canWrite)
-							handleImages(child);
+						/*	Write if the image is important (aka, not part of an ad, etc...) */
+						if(canWrite) {
+							handleImages(child);	// Write image alt text
+							child.remove();	// Then remove
+						}
 					}
 				} else if(excludeElements.contains(child)) {
 					//don't want to write this to file so delete
-
 					child.remove();
 				}
 			}
+			/* 	Recursively call children */
 			for(Element next : elt){
 				TopicTree(next.children());
 			}
@@ -236,25 +206,9 @@ public class Reducer {
 	}
 
 	private static String sanitizeTree(String text) {
-		/*BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader(stopWords));
-			text = text.replace("&nbsp;","");
-			text = text.toLowerCase();	// convert all to lower case so case doesn't mess up match with stopwords (since all of those are lowercase)
-			String line;
-			while ((line = br.readLine()) != null) {
-				text = text.replaceAll("\\b"+line+"\\b", "");
-			}
-			br.close();
-			return text;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return text;
-		}*/
 		text = text.replace("&nbsp;","");
 		text = text.toLowerCase();
 		return text;
 	}
-
 
 }

@@ -42,7 +42,6 @@ public class Crawler {
         if(repository.exists()){
             String[] entries = repository.list();
             for(String s: entries){     // Delete all pages in repository
-                //System.out.println("here");
                 File current = new File(repository.getPath(),s);
                 current.delete();
             }
@@ -142,19 +141,12 @@ public class Crawler {
                 }
             }
 
-            //System.out.println(santized_string+"\n");
-
             /*  If the domain has been visited in the last second, don't crawl this page */
-
             if(!checkDomain(current_page)) {
-                //System.out.println("be polite");
                 pages_to_crawl.add(current_page);   // Add the page back in the list of pages to crawl b/c politeness protocol says we can't right now
                 pages_crawled.remove(santized_string);
                 continue;
             }
-
-            //System.out.println(santized_string);
-            //System.out.println(pages_crawled);
 
             pages_crawled.add(santized_string);
 
@@ -165,10 +157,10 @@ public class Crawler {
                 continue;
 
             /*  There was a problem with crawling the page. Ignore and keep crawling */
-            if(!getPage(current_page, domain_restriction))
+            if(!getPage(current_page, domain_restriction)) {
+                pages_crawled.remove(santized_string);
                 continue;
-            //else
-                //System.out.println(pages_to_crawl);
+            }
         }
         System.out.println("\n\nDone-----------------");
 
@@ -211,8 +203,6 @@ public class Crawler {
             System.out.println("Could not create URL for robots.txt");
             return false;
         }
-        //System.out.println(robots_url.toString());
-
 
         try{
             BufferedReader robots_stream = new BufferedReader(new InputStreamReader(robots_url.openStream()));
@@ -221,7 +211,6 @@ public class Crawler {
             String page = url.getFile();
 
             while((line = robots_stream.readLine()) != null){
-                //System.out.println(line);
                 int offset = 0;
 
                 /*   Check if the line is a disallow statement we need to follow */
@@ -238,8 +227,6 @@ public class Crawler {
                     if(tokens.hasMoreTokens()){
                         String forbidden = tokens.nextToken();
 
-                        //System.out.println("Forbidden " + forbidden);
-
                         /*  Check that the URL we want to crawl is not in the banned
                          *  directory
                          */
@@ -252,7 +239,6 @@ public class Crawler {
 
                 }
             }
-            //close stream ?
         }
         catch(IOException e){
             System.out.println("Error reading from robots.txt");
@@ -266,7 +252,6 @@ public class Crawler {
         String domain = "";
         try {
             domain = new URI(URL).getHost();
-           // System.out.println(domain);
         }
         catch(URISyntaxException e){
             System.out.println("Error getting host");
@@ -307,9 +292,6 @@ public class Crawler {
 
             Elements img = doc.getElementsByTag("img");
             Elements outlinks = doc.select("a[href]");
-
-
-            // re no images fetched
 
 
             /* Write requirements to report.html */
@@ -374,8 +356,6 @@ public class Crawler {
                 }
             }
 
-            //System.out.println(URL); // Test Statement
-
             /*  Add the valid outlinks to the queue of pages to crawl */
             pages_to_crawl.addAll(links);
 
@@ -389,7 +369,10 @@ public class Crawler {
         catch(IOException ioe) {
             System.out.println("IO Exception.");
             System.out.println(URL);
-            return false;
+            /*  Req. 1: Write clickable title, links to live site */
+            report_content += "<h3><a href=\""+URL+"\"> "+URL+" </a></h3>";
+            /*  Req. 3: Write HTTP status code received (ex. 200, 404, etc.) */
+            report_content += "<p><strong>Status Code:</strong> "+ioe+"</p>";
         }
 
         writeToReport(report_content);
@@ -398,7 +381,6 @@ public class Crawler {
     }
 
     public static void writeToReport(String report_content){
-        //System.out.println("content" + report_content);
         try {
             writer_report.write(report_content);
             writer_report.newLine();

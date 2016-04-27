@@ -1,3 +1,15 @@
+/*
+ * Crawler.java
+ *
+ * Authors: Amanda Holl and Paige Rogalski
+ *
+ * Copyright 2016
+ *
+ * Used the following resources for ideas/starting point (did not copy code, but used some of the concepts/methods and refined, adapted,
+ * and built on top of it for this assignment: http://www.netinstructions.com/how-to-make-a-simple-web-crawler-in-java/,
+ * https://cs.nyu.edu/courses/fall02/G22.3033-008/WebCrawler.java
+ */
+
 package com.example.crawler;
 
 import java.io.*;
@@ -17,9 +29,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-
-/**
- * Created by amandaholl on 4/11/16.
+/* The crawler takes as input a comma-separated specification file called specifications.csv
+ * that contains a single seed URL, a maximum number of pages to crawl in total, and an optional
+ * domain restriction parameter. The crawler starts crawling the web from the supplied seed URL.
+ * For each page crawled, the crawler downloads the full textual content to a folder called repository,
+ * adds information about the page to a file called report.html, and crawls all outlinks until the
+ * maximum number of pages has been reached.
  */
 public class Crawler {
     private static File repository = new File("repository");
@@ -239,6 +254,7 @@ public class Crawler {
 
                 }
             }
+            robots_stream.close();
         }
         catch(IOException e){
             System.out.println("Error reading from robots.txt");

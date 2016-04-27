@@ -1,3 +1,12 @@
+/*
+ * Reducer.java
+ *
+ * Authors: Amanda Holl and Paige Rogalski
+ *
+ * Copyright 2016
+ */
+
+
 package com.example.crawler;
 
 import java.io.*;
@@ -13,7 +22,8 @@ import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 /*
- * 
+ * Class that reduces the HTML files obtained from the Crawler and
+ * outputs the text to a text file for further analysis
  * 
  */
 public class Reducer {
@@ -53,6 +63,10 @@ public class Reducer {
 
 	}
 
+	/*
+ 	 * This function hanldes HTML img alt tags
+ 	 */
+
 	public static void handleImages(Element elt)
 	{
 		/* Write alt image text if present */
@@ -67,47 +81,44 @@ public class Reducer {
 		}
 	}
 
+	/*
+ 	 * This fucntion identifies HTML tags that we do not want to include in our text document
+ 	 * and adds them to a list
+ 	 */
 	public static void excludeElements(Document doc)
 	{
 		Elements headers = doc.select("div[id~=header], div[class~=header], header");
-		 for(Element head : headers) {
+		 for(Element head : headers)
 			 excludeElements.add(head);
-		 }
 		 
 		 Elements footers = doc.select("div[id~=foot], div[class~=foot], footer");
-		 for(Element foot : footers) {
+		 for(Element foot : footers)
 			 excludeElements.add(foot);
-		 }
 		
 		Elements navs = doc.select("div[id~=nav], div[class~=nav], nav");	//gets any div with id containing nav
 		for(Element nav : navs)
-		{
 			excludeElements.add(nav);
-		}
 		
 		//handle ads 
 		Elements ads = doc.select("[id~=^ad],[id~=ad$],[class~=^ad],[class~=ad$], [data-analytics~=^Paid], [id~=^paid], [class~=^paid], [id~=logo], [class~=logo]");
 		for(Element ad : ads)
-		{
 			excludeElements.add(ad);
-		}
 		
 		//handle banners
 		Elements banners = doc.select("div.banner, div[id~=banner]");
-		for(Element banner : banners) 
-		{
+		for(Element banner : banners)
 			excludeElements.add(banner);
-		}
 
 		//handle noscript -> will be redundant info
 		Elements noscripts = doc.select("noscript");
 		for(Element noscript : noscripts)
-		{
 			excludeElements.add(noscript);
-		}
-
 	}
 
+	/*
+ 	 * This function reads in the HTML file from the repository
+ 	 * and begins to parse it to reduce noise
+ 	 */
 	public static void readHTML() {
 		String[] entries = htmlRepo.list();
 		for (String s : entries) {
@@ -117,8 +128,9 @@ public class Reducer {
 
 				Document doc = Jsoup.parse(current, null);
 
-				// write stuff to text file
-				String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt"; // Follow same naming convention as html page
+				// write to text file
+				// Follow same naming convention as html page
+				String filename = "textRepo/" + s.substring(0, s.length() - 5) + ".txt";
 				File outputFile = new File(filename);
 
 				if (!outputFile.exists()) {
@@ -190,6 +202,9 @@ public class Reducer {
 		return elt;
 	}
 
+	/*
+ 	 * This function identifies other important HTML tags we want to include in the text
+ 	 */
 	private static boolean tagImportant(Tag t){
 		String tag = t.getName();
 		// Check for special tags, whose text content is likely less than comparison, but still have value content
